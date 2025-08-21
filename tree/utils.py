@@ -4,19 +4,19 @@ There is no restriction on following the below template, these fucntions are her
 """
 
 import pandas as pd
+import numpy as np
 
 def one_hot_encoding(X: pd.DataFrame) -> pd.DataFrame:
     """
     Function to perform one hot encoding on the input data
     """
-
     pass
 
 def check_ifreal(y: pd.Series) -> bool:
     """
     Function to check if the given series has real or discrete values
     """
-
+    
     pass
 
 
@@ -24,8 +24,14 @@ def entropy(Y: pd.Series) -> float:
     """
     Function to calculate the entropy
     """
+    unique_values = Y.unique()
+    probabilities = Y.value_counts(normalize=True)
+    entropy_value = 0.0
 
-    pass
+    for prob in probabilities:
+        if prob > 0:
+            entropy_value -= prob *np.log2(prob)
+    return entropy_value
 
 
 def gini_index(Y: pd.Series) -> float:
@@ -40,7 +46,10 @@ def information_gain(Y: pd.Series, attr: pd.Series, criterion: str) -> float:
     """
     Function to calculate the information gain using criterion (entropy, gini index or MSE)
     """
-
+    if criterion == "information_gain":
+        return entropy(Y) - entropy(Y[attr])
+    elif criterion == "gini_index":
+        return gini_index(Y) - gini_index(Y[attr])
     pass
 
 
@@ -54,6 +63,20 @@ def opt_split_attribute(X: pd.DataFrame, y: pd.Series, criterion, features: pd.S
 
     return: attribute to split upon
     """
+    max_gain = -float('inf')
+    best_attr = None
+    for feature in features:
+        if check_ifreal(X[feature]):
+            # If the feature is real-valued, calculate information gain or gini index
+            gain = information_gain(y, X[feature], criterion)
+            if gain > max_gain and gain > 0:  # Ensure gain is positive
+                max_gain = gain
+                best_attr = feature
+        
+    if best_attr is not None:
+        return best_attr
+        
+    return None  # If no suitable attribute is found
 
     # According to wheather the features are real or discrete valued and the criterion, find the attribute from the features series with the maximum information gain (entropy or varinace based on the type of output) or minimum gini index (discrete output).
 
