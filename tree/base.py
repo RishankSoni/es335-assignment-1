@@ -67,7 +67,6 @@ class DecisionTree:
             ##
             return Node(features=best_attr, threshold=opt_val, left=left_node, right=right_node, gain=information_gain(y, X[best_attr], self.criterion), value=None,gain=best_gain)
             
-        pass
 
     def predict(self, X: pd.DataFrame) -> pd.Series:
         """
