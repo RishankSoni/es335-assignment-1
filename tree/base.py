@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from tree.utils import *
-
+import pandas as pd
 np.random.seed(42)
 
 
@@ -77,8 +77,23 @@ class DecisionTree:
         """
 
         # Traverse the tree you constructed to return the predicted values for the given test inputs.
+        def traverse_tree(node, x):
+            if(node.check_leaf()):
+                return node.value
+            if(check_ifreal(x[node.features])==False):
+                if x[node.features] == node.threshold:
+                    return traverse_tree(node.left, x)
+                else:
+                    return traverse_tree(node.right, x)
+            else:
+                if x[node.features] <=node.threshold:
+                    return traverse_tree(node.left, x)
+                else:
+                    return traverse_tree(node.right, x)
 
-        pass
+        return pd.Series([traverse_tree(self.root, x) for _, x in X.iterrows()])  
+
+
 
     def plot(self) -> None:
         """
@@ -92,4 +107,15 @@ class DecisionTree:
             N: Class C
         Where Y => Yes and N => No
         """
-        pass
+        def plot_tree(node,depth=0):
+            if node.check_leaf():
+                print("\t"*depth+"Leaf: Value = "+str(node.value))
+            else:
+                print("\t"*depth+"?( "+str(node.features)+" <= "+str(node.threshold)+" ) Gain: "+str(node.gain))
+                plot_tree(node.left,depth+1)
+                plot_tree(node.right,depth+1)
+        if(self.root is not None):
+            plot_tree(self.root)
+        else:
+            print("The tree has not been trained yet.")
+     
