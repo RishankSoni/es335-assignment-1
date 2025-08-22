@@ -79,6 +79,27 @@ def information_gain(Y: pd.Series, attr: pd.Series, criterion: str) -> float:
     else:
         return Mean_squared_error(Y)
 
+def best_threshold(X: pd.Series, y: pd.Series, criterion, features: pd.Series):
+    X_sorted=X.sort_values()
+    y_sorted=y.loc[X_sorted.index]
+    best_gain = -np.inf
+    best_thres=None
+    for i in range(1,len(X_sorted)):
+        if X_sorted[i]==X_sorted[i-1]:
+            continue
+        threshold=(X_sorted[i]+X_sorted[i-1])/2
+        
+        left=y_sorted[X_sorted<=threshold]
+        right=y_sorted[X_sorted>threshold]
+        
+        if len(left)==0 or len(right)==0:
+            continue
+        
+        gain = Mean_squared_error(y)-((len(left)/len(y)*Mean_squared_error(left))+(len(right)/len(y)*Mean_squared_error(right)))
+        if gain>best_gain and gain >0 :
+            best_gain=gain
+            best_thres=threshold
+    return best_thres
 
 def opt_split_attribute(X: pd.DataFrame, y: pd.Series, criterion, features: pd.Series):
     """

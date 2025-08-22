@@ -56,14 +56,22 @@ class DecisionTree:
                 else:
                     return Node(value=y.mode()[0])
             best_attr = opt_split_attribute(X, y, self.criterion, X.columns)
+            
             if best_attr is None:
-                return Node(value=y.mean()[0])
-            opt_val= X[best_attr].mean()[0]
+                if check_ifreal(y):
+                    return Node(value=y.mean()[0])
+                else:
+                    return Node(value=y.mode()[0])
+            
+            if check_ifreal(y):
+                opt_val= best_threshold(X[best_attr],y,self.criterion)
+            else:
+                opt_val = X[best_attr].mode()[0]
             # left_indices = X[best_attr] <= opt_val
             # right_indices = X[best_attr] > opt_val
             left_indices,right_indices=split_data(X, y, best_attr, opt_val)
-            left_node = build_tree(X[left_indices], y[left_indices], depth + 1)
-            right_node = build_tree(X[right_indices], y[right_indices], depth + 1)
+            left_node = build_tree(opt_val,X[left_indices], y[left_indices], depth + 1)
+            right_node = build_tree(opt_val,X[right_indices], y[right_indices], depth + 1)
 
             
             best_gain = information_gain(y, X[best_attr], self.criterion)
