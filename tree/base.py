@@ -51,7 +51,10 @@ class DecisionTree:
         # You may(according to your implemetation) need to call functions recursively to construct the tree. 
         def build_tree(X, y, depth=0):
             if len(y.unique()) == 1 or depth >= self.max_depth:
-                return Node(value=y.mean()[0])
+                if check_ifreal(y):
+                    return Node(value=y.mean()[0])
+                else:
+                    return Node(value=y.mode()[0])
             best_attr = opt_split_attribute(X, y, self.criterion, X.columns)
             if best_attr is None:
                 return Node(value=y.mean()[0])

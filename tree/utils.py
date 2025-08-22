@@ -98,7 +98,11 @@ def opt_split_attribute(X: pd.DataFrame, y: pd.Series, criterion, features: pd.S
             if gain > max_gain and gain > 0:  # Ensure gain is positive
                 max_gain = gain
                 best_attr = feature
-
+        else:
+            gain=information_gain(y,X,criterion)
+            if gain>max_gain and gain>0:
+                max_gain=gain
+                best_attr=feature
     if best_attr is not None:
         return best_attr
 
@@ -129,6 +133,5 @@ def split_data(X: pd.DataFrame, y: pd.Series, attribute, value):
     else:
         X_left=X[X[attribute]==value]
         X_right=X[X[attribute]!=value]
-    y_left = y.loc[X_left.index]
-    y_right = y.loc[X_right.index]
-    return X_left,y_left,X_right,y_right
+        
+    return X_left.index,X_right.index
