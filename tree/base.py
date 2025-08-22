@@ -104,4 +104,15 @@ class DecisionTree:
             N: Class C
         Where Y => Yes and N => No
         """
-        pass
+        def plot_tree(node,depth=0):
+            if node.check_leaf():
+                print("\t"*depth+"Leaf: Value = "+str(node.value))
+            else:
+                print("\t"*depth+"?( "+str(node.features)+" <= "+str(node.threshold)+" ) Gain: "+str(node.gain))
+                plot_tree(node.left,depth+1)
+                plot_tree(node.right,depth+1)
+        if(self.root is not None):
+            plot_tree(self.root)
+        else:
+            print("The tree has not been trained yet.")
+     
