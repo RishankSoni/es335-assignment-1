@@ -52,14 +52,14 @@ class DecisionTree:
         def build_tree(X, y, depth=0):
             if len(y.unique()) == 1 or depth >= self.max_depth:
                 if check_ifreal(y):
-                    return Node(value=y.mean()[0])
+                    return Node(value=y.mean())
                 else:
                     return Node(value=y.mode()[0])
             best_attr = opt_split_attribute(X, y, self.criterion, X.columns)
             
             if best_attr is None:
                 if check_ifreal(y):
-                    return Node(value=y.mean()[0])
+                    return Node(value=y.mean())
                 else:
                     return Node(value=y.mode()[0])
             
@@ -72,18 +72,18 @@ class DecisionTree:
             left_indices,right_indices=split_data(X, y, best_attr, opt_val)
             if left_indices.empty or right_indices.empty:
                 if check_ifreal(y):
-                    return Node(is_leaf=True, output=np.round(y.mean(),4))
+                    return Node(value=y.mean())
                 else:
-                    return Node(is_leaf=True, output=y.mode()[0])
+                    return Node(value=y.mode()[0])
             
-            left_node = build_tree(opt_val,X[left_indices], y[left_indices], depth + 1)
-            right_node = build_tree(opt_val,X[right_indices], y[right_indices], depth + 1)
+            left_node = build_tree(X[left_indices], y[left_indices], depth + 1)
+            right_node = build_tree(X[right_indices], y[right_indices], depth + 1)
 
             
             best_gain = information_gain(y, X[best_attr], self.criterion)
-            ##
-            return Node(features=best_attr, threshold=opt_val, left=left_node, right=right_node, gain=information_gain(y, X[best_attr], self.criterion), value=None,gain=best_gain)
-        self.root=build_tree(X,y,self.max_depth)
+            
+            return Node(features=best_attr, threshold=opt_val, left=left_node, right=right_node, value=None,gain=best_gain)
+        self.root=build_tree(X,y,0)
 
     def predict(self, X: pd.DataFrame) -> pd.Series:
         """
