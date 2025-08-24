@@ -28,6 +28,7 @@ class Node:
         self.right = right  # Right child node
         self.value = value  # Value for leaf nodes
         self.gain = gain  # Information gain for the split
+        
     
     def check_leaf(self):
         return self.value is not None
@@ -40,6 +41,7 @@ class DecisionTree:
     def __init__(self, criterion, max_depth=5):
         self.criterion = criterion
         self.max_depth = max_depth
+        self.trained_features = [] # To store column names after encoding
 
     def fit(self, X: pd.DataFrame, y: pd.Series) -> None:
         """
@@ -49,6 +51,9 @@ class DecisionTree:
         # If you wish your code can have cases for different types of input and output data (discrete, real)
         # Use the functions from utils.py to find the optimal attribute to split upon and then construct the tree accordingly.
         # You may(according to your implemetation) need to call functions recursively to construct the tree. 
+
+      
+
         def build_tree(X, y, depth=0):
             if len(y.unique()) == 1 or depth >= self.max_depth:
                 if check_ifreal(y):
@@ -63,12 +68,10 @@ class DecisionTree:
                 else:
                     return Node(value=y.mode()[0])
             
-            if check_ifreal(y):
+            if check_ifreal(X[best_attr]):
                 opt_val= best_threshold(X[best_attr],y,self.criterion)
             else:
                 opt_val = X[best_attr].mode()[0]
-            # left_indices = X[best_attr] <= opt_val
-            # right_indices = X[best_attr] > opt_val
             left_indices,right_indices=split_data(X, y, best_attr, opt_val)
             if left_indices.empty or right_indices.empty:
                 if check_ifreal(y):
@@ -76,13 +79,17 @@ class DecisionTree:
                 else:
                     return Node(value=y.mode()[0])
             
-            left_node = build_tree(X[left_indices], y[left_indices], depth + 1)
-            right_node = build_tree(X[right_indices], y[right_indices], depth + 1)
+            left_node = build_tree(X.loc[left_indices], y.loc[left_indices], depth + 1)
+            right_node = build_tree(X.loc[right_indices], y.loc[right_indices], depth + 1)
 
             
             best_gain = information_gain(y, X[best_attr], self.criterion)
             
             return Node(features=best_attr, threshold=opt_val, left=left_node, right=right_node, value=None,gain=best_gain)
+        
+        #converting discrete features to one hot encoding
+        X=one_hot_encoding(X)
+        self.trained_features = X.columns.tolist()
         self.root=build_tree(X,y,0)
 
     def predict(self, X: pd.DataFrame) -> pd.Series:
@@ -104,8 +111,16 @@ class DecisionTree:
                     return traverse_tree(node.left, x)
                 else:
                     return traverse_tree(node.right, x)
+                
+        X_encoded = one_hot_encoding(X)
+        for col in self.trained_features:
+            if col not in X_encoded.columns:
+                X_encoded[col] = 0
+        X_encoded = X_encoded[self.trained_features]
+        
+            
 
-        return pd.Series([traverse_tree(self.root, x) for _, x in X.iterrows()])  
+        return pd.Series([traverse_tree(self.root, x) for _, x in X_encoded.iterrows()])  
 
 
 

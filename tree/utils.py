@@ -11,11 +11,16 @@ def one_hot_encoding(X: pd.DataFrame) -> pd.DataFrame:
     """
     Function to perform one hot encoding on the input data
     """
+    # Making discrete features as different columns with binary values with on hot encoding
+    for col in X.columns:
+        if not check_ifreal(X[col], int_threshold=10):
+            dummies = pd.get_dummies(X[col], prefix=f"is_{col}")
+            X = pd.concat([X, dummies], axis=1)
+            X.drop(col, axis=1, inplace=True)
+    return X
 
-    pass
 
-
-def check_ifreal(y: pd.Series, int_threshold) -> bool:
+def check_ifreal(y: pd.Series, int_threshold = 5) -> bool:
     """
     Function to check if the given series has real or discrete values
     """
@@ -27,7 +32,7 @@ def check_ifreal(y: pd.Series, int_threshold) -> bool:
         return len(np.unique(y)) >= int_threshold
     return False
 
-    pass
+
 
 
 def entropy(Y: pd.Series) -> float:
@@ -71,16 +76,26 @@ def information_gain(Y: pd.Series, attr: pd.Series, criterion: str) -> float:
     """
     Function to calculate the information gain using criterion (entropy, gini index or MSE)
     """
+    if check_ifreal(attr):
+        threshold = best_threshold(attr, Y, criterion)
+        left_index,right_index = split_data(attr.to_frame(), Y, attr.name, threshold)
+
+    else :
+        left_index,right_index = attr[attr == attr.mode()[0]].index, attr[attr != attr.mode()[0]].index
+    left_weight = len(left_index) / len(Y)
+    right_weight = len(right_index) / len(Y)
     if check_ifreal(Y) == False:
         if criterion == "information_gain":
-            return entropy(Y) - entropy(Y[attr])
+   
+            return entropy(Y) - (left_weight * entropy(Y[left_index]) + right_weight * entropy(Y[right_index]))
         elif criterion == "gini_index":
-            return gini_index(Y) - gini_index(Y[attr])
+    
+            return gini_index(Y) - (left_weight * gini_index(Y[left_index]) + right_weight * gini_index(Y[right_index]))
     else:
-        return Mean_squared_error(Y)
+        return Mean_squared_error(Y) - (left_weight * Mean_squared_error(Y[left_index]) + right_weight * Mean_squared_error(Y[right_index]))
 
 
-def best_threshold(X: pd.Series, y: pd.Series, criterion, features: pd.Series):
+def best_threshold(X: pd.Series, y: pd.Series, criterion):
     X_sorted = X.sort_values()
     y_sorted = y.loc[X_sorted.index]
     best_gain = -np.inf
@@ -126,7 +141,7 @@ def opt_split_attribute(X: pd.DataFrame, y: pd.Series, criterion, features: pd.S
                 max_gain = gain
                 best_attr = feature
         else:
-            gain = information_gain(y, X, criterion)
+            gain = information_gain(y, X[feature], criterion)
             if gain > max_gain and gain > 0:
                 max_gain = gain
                 best_attr = feature
@@ -153,7 +168,7 @@ def split_data(X: pd.DataFrame, y: pd.Series, attribute, value):
     """
 
     # Split the data based on a particular value of a particular attribute. You may use masking as a tool to split the data.
-    if check_ifreal(y):
+    if check_ifreal(X[attribute]):
         X_left = X[X[attribute] <= value]
         X_right = X[X[attribute] > value]
     else:
