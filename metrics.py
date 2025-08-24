@@ -16,7 +16,7 @@ def accuracy(y_hat: pd.Series, y: pd.Series) -> float:
     # TODO: Write here
     assert y.size > 0, "Input series cannot be empty"
     return (y_hat == y).mean()
-    pass
+    
 
 
 def precision(y_hat: pd.Series, y: pd.Series, cls: Union[int, str]) -> float:
