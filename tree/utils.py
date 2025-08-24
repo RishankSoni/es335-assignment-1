@@ -84,6 +84,8 @@ def information_gain(Y: pd.Series, attr: pd.Series, criterion: str) -> float:
         left_index,right_index = attr[attr == attr.mode()[0]].index, attr[attr != attr.mode()[0]].index
     left_weight = len(left_index) / len(Y)
     right_weight = len(right_index) / len(Y)
+    if len(left_index) == 0 or len(right_index) == 0:
+        return 0.0
     if check_ifreal(Y) == False:
         if criterion == "information_gain":
    
