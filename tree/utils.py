@@ -102,6 +102,15 @@ def best_threshold(X: pd.Series, y: pd.Series, criterion):
     y_sorted = y.loc[X_sorted.index]
     best_gain = -np.inf
     best_thres = None
+    if check_ifreal(y):
+        impurity_func = Mean_squared_error
+        parent_impurity = impurity_func(y)
+    else:
+        if criterion == "information_gain":
+            impurity_func = entropy
+        else:  
+            impurity_func = gini_index
+        parent_impurity = impurity_func(y)
     for i in range(1, len(X_sorted)):
         if X_sorted.iloc[i] == X_sorted.iloc[i - 1]:
             continue
@@ -113,9 +122,9 @@ def best_threshold(X: pd.Series, y: pd.Series, criterion):
         if len(left) == 0 or len(right) == 0:
             continue
 
-        gain = Mean_squared_error(y) - (
-            (len(left) / len(y) * Mean_squared_error(left))
-            + (len(right) / len(y) * Mean_squared_error(right))
+        gain = impurity_func(y) - (
+            (len(left) / len(y) * impurity_func(left))
+            + (len(right) / len(y) * impurity_func(right))
         )
         if gain > best_gain and gain > 0:
             best_gain = gain
