@@ -87,15 +87,15 @@ print("Done Combining the training data")
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 # Load all the accelerometer data
-total_acc_x = pd.read_csv(os.path.join(test_path,"Inertial Signals","total_acc_x_test.txt"),delim_whitespace=True,header=None)
-total_acc_y = pd.read_csv(os.path.join(test_path,"Inertial Signals","total_acc_y_test.txt"),delim_whitespace=True,header=None)
-total_acc_z = pd.read_csv(os.path.join(test_path,"Inertial Signals","total_acc_z_test.txt"),delim_whitespace=True,header=None)
+total_acc_x = pd.read_csv(os.path.join(test_path,"Inertial Signals","total_acc_x_test.txt"),sep='\s+',header=None)
+total_acc_y = pd.read_csv(os.path.join(test_path,"Inertial Signals","total_acc_y_test.txt"),sep='\s+',header=None)
+total_acc_z = pd.read_csv(os.path.join(test_path,"Inertial Signals","total_acc_z_test.txt"),sep='\s+',header=None)
 
 # Read the subject IDs
-subject_test = pd.read_csv(os.path.join(test_path,"subject_test.txt"),delim_whitespace=True,header=None)
+subject_test = pd.read_csv(os.path.join(test_path,"subject_test.txt"),sep='\s+',header=None)
 
 # Read the labels
-y = pd.read_csv(os.path.join(test_path,"y_test.txt"),delim_whitespace=True,header=None)
+y = pd.read_csv(os.path.join(test_path,"y_test.txt"),sep='\s+',header=None)
 
 # Toggle through all the subjects.
 for subject in np.unique(subject_test.values):
