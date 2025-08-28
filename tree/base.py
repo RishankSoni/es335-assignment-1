@@ -6,6 +6,8 @@ You will be expected to use this to make trees for:
 > real input, discrete output
 > discrete input, real output
 """
+
+# importing all the necessary libraries
 from dataclasses import dataclass
 from typing import Literal
 
@@ -19,6 +21,7 @@ np.random.seed(42)
 
 @dataclass
 
+#defining the structure of a node of the decision tree
 class Node:
     def __init__(self, features=None, threshold=None, left=None, right=None, value=None,gain=0):
         
@@ -32,15 +35,17 @@ class Node:
     
     def check_leaf(self):
         return self.value is not None
+
+# defining the structure of the decision tree
 class DecisionTree:
 
 
-    criterion: Literal["information_gain", "gini_index"]  # criterion won't be used for regression
+    criterion: Literal["information_gain", "gini_index"]  # criterion that will be used for splitting the discrete attributes
     max_depth: int  # The maximum depth the tree can grow to
 
     def __init__(self, criterion, max_depth=5):
-        self.criterion = criterion
-        self.max_depth = max_depth
+        self.criterion = criterion #storing the criterion that will be used to split discrete attributes
+        self.max_depth = max_depth # storing the max_depth of tree which if not specifically mentioned will be 5 
         self.trained_features = [] # To store column names after encoding
 
     def fit(self, X: pd.DataFrame, y: pd.Series) -> None:
@@ -53,27 +58,28 @@ class DecisionTree:
         # You may(according to your implemetation) need to call functions recursively to construct the tree. 
 
       
-
+        # building the tree by using recursion by the algorithm explained in the class
         def build_tree(X, y, depth=0):
-            if len(y.unique()) == 1 or depth >= self.max_depth:
-                if check_ifreal(y):
+            if len(y.unique()) == 1 or depth >= self.max_depth: # if all attributes of y are same or we have achieved max_depth defined we make the node as a leaf
+                if check_ifreal(y): # if y is real store its mean value as value of leaf
                     return Node(value=y.mean())
                 else:
-                    return Node(value=y.mode()[0])
+                    return Node(value=y.mode()[0]) # if y is discrete store its mode value as value of leaf
             best_attr = opt_split_attribute(X, y, self.criterion, X.columns)
             
-            if best_attr is None:
-                if check_ifreal(y):
+            if best_attr is None: # if there is no attribute left to split upon we make the node as a leaf
+                if check_ifreal(y): # if y is real store its mean value as value of leaf
                     return Node(value=y.mean())
                 else:
-                    return Node(value=y.mode()[0])
+                    return Node(value=y.mode()[0]) # if y is discrete store its mode value as value of leaf
             
-            if check_ifreal(X[best_attr]):
-                opt_val= best_threshold(X[best_attr],y,self.criterion)
+            if check_ifreal(X[best_attr]): # if we find a best atrribute split the data on the basis of optimal value
+                opt_val= best_threshold(X[best_attr],y,self.criterion) # for real attributes finding the optimal threshold and then splitting
             else:
-                opt_val = X[best_attr].mode()[0]
+                opt_val = X[best_attr].mode()[0] # for discrete attributes finding the optimal threshold is found by the mode
             left_indices,right_indices=split_data(X, y, best_attr, opt_val)
-            if left_indices.empty or right_indices.empty:
+            
+            if left_indices.empty or right_indices.empty: # if after split any of the data is empty we make the node as a leaf
                 if check_ifreal(y):
                     return Node(value=y.mean())
                 else:
