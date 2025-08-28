@@ -1,7 +1,9 @@
+#importing all necessary libraries
+
 from typing import Union
 import pandas as pd
 
-
+#function to find accuracy 
 def accuracy(y_hat: pd.Series, y: pd.Series) -> float:
     """
     Function to calculate the accuracy
@@ -18,7 +20,7 @@ def accuracy(y_hat: pd.Series, y: pd.Series) -> float:
     return (y_hat == y).mean()
     
 
-
+#function to find precision
 def precision(y_hat: pd.Series, y: pd.Series, cls: Union[int, str]) -> float:
     """
     Function to calculate the precision
@@ -32,7 +34,7 @@ def precision(y_hat: pd.Series, y: pd.Series, cls: Union[int, str]) -> float:
     return TP / (TP + FP)
 
 
-
+#function to find recall
 def recall(y_hat: pd.Series, y: pd.Series, cls: Union[int, str]) -> float:
     """
     Function to calculate the recall
@@ -45,6 +47,7 @@ def recall(y_hat: pd.Series, y: pd.Series, cls: Union[int, str]) -> float:
         return 0.0
     return TP / (TP + FN)
 
+#function to find root mean square error
 def rmse(y_hat: pd.Series, y: pd.Series) -> float:
     """
     Function to calculate the root-mean-squared-error(rmse)
@@ -55,7 +58,7 @@ def rmse(y_hat: pd.Series, y: pd.Series) -> float:
 
 
 
-
+#function to find mean absolute error
 def mae(y_hat: pd.Series, y: pd.Series) -> float:
     """
     Function to calculate the mean-absolute-error(mae)

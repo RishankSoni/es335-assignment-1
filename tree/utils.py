@@ -2,11 +2,11 @@
 You can add your own functions here according to your decision tree implementation.
 There is no restriction on following the below template, these fucntions are here to simply help you.
 """
-
+#importing all necessary libraries
 import pandas as pd
 import numpy as np
 
-
+#performing one hot encoding on the discrete features of the input data
 def one_hot_encoding(X: pd.DataFrame) -> pd.DataFrame:
     """
     Function to perform one hot encoding on the input data
@@ -20,6 +20,7 @@ def one_hot_encoding(X: pd.DataFrame) -> pd.DataFrame:
     return X
 
 
+# function to check if the given series has real or discrete values
 def check_ifreal(y: pd.Series, int_threshold = 5) -> bool:
     """
     Function to check if the given series has real or discrete values
@@ -34,7 +35,7 @@ def check_ifreal(y: pd.Series, int_threshold = 5) -> bool:
 
 
 
-
+#Function to calculate entropy to know about the impurity of the discrete data
 def entropy(Y: pd.Series) -> float:
     """
     Function to calculate the entropy
@@ -49,6 +50,7 @@ def entropy(Y: pd.Series) -> float:
     return entropy_value
 
 
+#Function to calculate gini index to know about the impurity of the discrete data
 def gini_index(Y: pd.Series) -> float:
     """
     Function to calculate the gini index
@@ -63,6 +65,7 @@ def gini_index(Y: pd.Series) -> float:
     return gini_value
 
 
+#Function to calculate Mean Squared Error to know about the impurity of the real data
 def Mean_squared_error(y: pd.Series):
     means = y.mean()
     ms = 0.0
@@ -71,7 +74,7 @@ def Mean_squared_error(y: pd.Series):
     ms /= len(y)
     return ms
 
-
+#Function to find information gain depending on whether the attribute is discrete or real and if discrete which criterion to use 
 def information_gain(Y: pd.Series, attr: pd.Series, criterion: str) -> float:
     """
     Function to calculate the information gain using criterion (entropy, gini index or MSE)
@@ -96,7 +99,7 @@ def information_gain(Y: pd.Series, attr: pd.Series, criterion: str) -> float:
     else:
         return Mean_squared_error(Y) - (left_weight * Mean_squared_error(Y[left_index]) + right_weight * Mean_squared_error(Y[right_index]))
 
-
+#If the data is real finding the optimal threshold to split the data
 def best_threshold(X: pd.Series, y: pd.Series, criterion):
     X_sorted = X.sort_values()
     y_sorted = y.loc[X_sorted.index]
@@ -131,7 +134,7 @@ def best_threshold(X: pd.Series, y: pd.Series, criterion):
             best_thres = threshold
     return best_thres
 
-
+#Finding the optimal attribute for splitting depending on whether the attribute is real or not
 def opt_split_attribute(X: pd.DataFrame, y: pd.Series, criterion, features: pd.Series):
     """
     Function to find the optimal attribute to split about.
@@ -165,7 +168,7 @@ def opt_split_attribute(X: pd.DataFrame, y: pd.Series, criterion, features: pd.S
 
     pass
 
-
+#function to split the data on the basis of optimal attribute and optimal threshold if the attribute is real
 def split_data(X: pd.DataFrame, y: pd.Series, attribute, value):
     """
     Funtion to split the data according to an attribute.
